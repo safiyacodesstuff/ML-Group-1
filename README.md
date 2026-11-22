@@ -11,11 +11,31 @@
 <i>Please copy these commands to set the project up on your device :]</i>
 
 ```bash
-python3 -m venv .venv
+git clone https://github.com/safiyacodesstuff/ML-Group-1.git
+cd ML-Group-1
+python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-jupyter lab
 ```
+<br>
+
+Also, please <i><b>always</b></i> do this before working:
+
+```bash
+git pull
+source .venv/bin/activate
+```
+<br>
+
+Commit your work via:
+
+```bash
+git add .
+git commit -m "..."
+git push
+```
+<br>
+
 
 ## Data 📊
 Download Link to our Dataset: https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews/data
