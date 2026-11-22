@@ -13,7 +13,7 @@
 ```bash
 git clone https://github.com/safiyacodesstuff/ML-Group-1.git
 cd ML-Group-1
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
