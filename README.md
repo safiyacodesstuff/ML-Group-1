@@ -5,9 +5,12 @@
 <i><b>Assignment:</b></i> Building A Book Recommender System 💡
 
 ## Aim 🎯
+
 [to be filled in, once we agree on the specifics]
 
 ## Setup 🛠️
+
+<b>Required:</b> Python 3.12+
 <i>Please copy these commands to set the project up on your device :]</i>
 
 ```bash
@@ -17,6 +20,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
 <br>
 
 Also, please <i><b>always</b></i> do this before working:
@@ -25,6 +29,7 @@ Also, please <i><b>always</b></i> do this before working:
 git pull
 source .venv/bin/activate
 ```
+
 <br>
 
 Commit your work via:
@@ -34,13 +39,13 @@ git add .
 git commit -m "..."
 git push
 ```
-<br>
-
 
 ## Data 📊
+
 Download Link to our Dataset: https://www.kaggle.com/datasets/mohamedbakhet/amazon-books-reviews/data
 <br>
 <i>Unpack it in ./data please :]</i>
 
 ## Results 🎖️
+
 [to be seen]
