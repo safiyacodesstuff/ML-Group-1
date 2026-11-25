@@ -56,6 +56,26 @@ Nach dem Aufraeuemen bleiben ca. 80 % der Daten (rund 2,4 Mio Zeilen). Davon wir
 
 ---
 
+## Datensatz aufbereiten: "erst bereinigen, dann sampeln"
+
+- Korrektheit der Stratifikation: Das Sampling stratifiziert nach review/score. Wenn noch Zeilen ohne Score drin sind, werden sie von groupby still ignoriert – das macht den Sampling-Code zwar nicht falsch, aber es ist sauberer, das explizit zu droppen.
+
+- Repräsentativität: Wenn Zeilen ohne User_id erst nach dem Sampling rausfallen, kann die Klassenverteilung im Sample leicht kippen.
+
+Praktischer Kompromiss: Man muss nicht alle 3 Mio. Zeilen durch den vollen Preprocessing-Stack jagen. Die minimale Bereinigung vor dem Sampling reicht:
+
+# Minimal-Bereinigung VOR dem Subsampling
+df = df.dropna(subset=['review/score', 'User_id'])
+df = df.drop(columns=['Price', 'ratingsCount', 'description', 'image',
+                       'previewLink', 'infoLink', 'profileName'])
+
+# DANN sampeln
+df_sample = df.groupby('review/score', group_keys=False).apply(
+    lambda x: x.sample(frac=0.02, random_state=42)
+).reset_index(drop=True)
+
+---
+
 ## Schritt 1: Subsampling
 
 Aus den bereinigten Daten ein kleineres, repraesentatives Sample ziehen.
@@ -78,6 +98,30 @@ print(df_sample['review/score'].value_counts(normalize=True))
 ```
 
 Warum nicht einfach die ersten 60.000 Zeilen? Weil die vielleicht alle aus dem gleichen Zeitraum oder der gleichen Kategorie kommen. Stratified Random Sampling ist sauberer.
+
+# Feedback zum Code von Schritt 1
+- Was gut ist:
+
+groupby('review/score') mit frac=... ist sauberes stratifiziertes Sampling – genau richtig
+group_keys=False verhindert einen störenden Multi-Index – korrekt
+random_state=42 sorgt für Reproduzierbarkeit – unbedingt beibehalten
+Der Prüfcode mit value_counts(normalize=True) ist wichtig – gut, dass er explizit erwähnt wird
+
+- Was ich verbessern würde:
+
+reset_index(drop=True) anhängen – nach groupby().apply() kann der Index chaotisch sein, das kann später beim .join() im Feature Engineering zu Bugs führen
+
+frac=0.02 ist knapp – 2 % von 2,4 Mio. = ~48.000 Zeilen. Bei sehr seltenen Usern oder Büchern im Sample sind user_avg_score oder book_avg_score aus nur 1–2 Reviews berechnet – instabil. frac=0.03 (ca. 72.000 Zeilen) wäre robuster, bei modernen Rechnern kein Problem.
+
+Review/score als Integer casten – der Score kann im CSV als Float (1.0, 2.0...) vorliegen, was beim Groupby zu Problemen führen kann:
+
+df['review/score'] = df['review/score'].astype(int)
+Prüfung nach dem Sampling erweitern – neben der Score-Verteilung auch die Größe prüfen:
+
+print(df_sample.shape)
+print(df_sample['review/score'].value_counts())           # Absolute Zahlen
+print(df_sample['review/score'].value_counts(normalize=True))  # Anteile
+Zusammenfassung: Der Kern-Code ist korrekt und durchdacht. Die drei kleinen Ergänzungen (reset_index, frac leicht erhöhen, Score zu int casten) machen ihn robuster für die späteren Schritte.
 
 ---
 
